@@ -12,7 +12,7 @@ function setupSheetHtml(initialCategories) {
     <div class="setup-sheet">
       <p class="console-kicker">Tune the signal</p>
       <h1>What kinds of detours are allowed?</h1>
-      <p class="setup-copy">Choose what you want in the mix. This stays on this device.</p>
+      <p class="setup-copy">Choose what you want in the mix. This stays in this browser.</p>
       <form class="setup-form">
         <fieldset>
           <legend class="sr-only">Allowed mission categories</legend>

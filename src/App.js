@@ -26,7 +26,7 @@ function appShellHtml(content = `
 function addResetControl(console, onReset) {
     const footer = document.createElement('div');
     footer.className = 'local-footer';
-    footer.innerHTML = `<span>Profile stays on this device.</span><button type="button" class="text-button" data-reset>Reset local setup</button>`;
+    footer.innerHTML = `<span>Profile stays in this browser.</span><button type="button" class="text-button" data-reset>Reset local setup</button>`;
     footer.querySelector('[data-reset]').addEventListener('click', onReset);
     console.append(footer);
 }

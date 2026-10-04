@@ -2,6 +2,8 @@
 
 **What have you got in the tank?**
 
+**Play:** <https://cashie1597.github.io/mothership/>
+
 Mothership is a tiny flight console for days when a long task list is the wrong
 answer. Pick your energy and available time; it offers one small mission. Reroute
 if that one is not it. The mission deck includes making, resetting, moving,
