@@ -1,0 +1,980 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#070911" />
+<meta name="color-scheme" content="dark" />
+<title>Surprise</title>
+<style>:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #070911;
+  color: #f7f5ef;
+  font-synthesis: none;
+  --bg: #070911;
+  --surface: rgba(18, 21, 33, 0.76);
+  --surface-solid: #111521;
+  --line: rgba(255, 255, 255, 0.11);
+  --text: #f7f5ef;
+  --muted: #9ba1b2;
+  --accent: #ffb45f;
+  --accent-soft: rgba(255, 180, 95, 0.14);
+  --radius: 24px;
+}
+
+* { box-sizing: border-box; }
+
+html, body { min-height: 100%; }
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 72% 18%, rgba(88, 73, 119, .17), transparent 32rem),
+    radial-gradient(circle at 20% 78%, rgba(255, 180, 95, .08), transparent 28rem),
+    var(--bg);
+  color: var(--text);
+}
+
+button, input { font: inherit; }
+button { color: inherit; }
+
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.app { min-height: 100vh; }
+
+.reveal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #060810;
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 180ms ease;
+}
+
+.reveal--departing { opacity: 0; }
+
+.reveal__content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  animation: reveal-rise 700ms cubic-bezier(.2,.8,.2,1) both;
+}
+
+.reveal__signal {
+  color: var(--accent);
+  font-size: .72rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 22px rgba(255,180,95,.8);
+}
+
+.reveal__name {
+  margin: 0;
+  font-size: clamp(2.35rem, 9vw, 5.6rem);
+  font-weight: 760;
+  letter-spacing: .18em;
+  padding-left: .18em;
+}
+
+.reveal__subline {
+  margin: .8rem 0 0;
+  color: var(--muted);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  font-size: .7rem;
+}
+
+.reveal__orbit {
+  position: absolute;
+  width: min(78vw, 760px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 50%;
+  transform: rotate(-18deg) scaleY(.42);
+  animation: orbit-pulse 1s ease-out both;
+}
+.reveal__orbit--two {
+  width: min(52vw, 500px);
+  animation-delay: 80ms;
+  opacity: .6;
+}
+.reveal__stars {
+  position: absolute;
+  inset: 0;
+  opacity: .45;
+  background-image:
+    radial-gradient(circle at 12% 22%, #fff 0 1px, transparent 1.5px),
+    radial-gradient(circle at 79% 14%, #fff 0 1px, transparent 1.5px),
+    radial-gradient(circle at 66% 76%, #fff 0 1px, transparent 1.5px),
+    radial-gradient(circle at 29% 68%, #fff 0 1px, transparent 1.5px),
+    radial-gradient(circle at 92% 58%, #fff 0 1px, transparent 1.5px);
+}
+
+.shell {
+  width: min(1040px, calc(100% - 32px));
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 24px 0 56px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 44px;
+}
+
+.masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 18px;
+}
+
+.brand-lockup { display: flex; align-items: center; gap: 10px; }
+.brand-mark {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 16px rgba(255, 180, 95, .6);
+}
+.brand-name, .status-copy, .console-kicker {
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-size: .68rem;
+  font-weight: 720;
+}
+.status-copy { color: var(--muted); }
+
+.console {
+  align-self: center;
+  max-width: 760px;
+  padding: clamp(24px, 5vw, 56px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.018));
+  box-shadow: 0 34px 80px rgba(0,0,0,.28);
+  backdrop-filter: blur(14px);
+}
+.console-kicker { color: var(--accent); margin: 0 0 18px; }
+h1 {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 4.4rem);
+  line-height: .98;
+  letter-spacing: -.045em;
+  max-width: 12ch;
+}
+h1 span { color: #afb5c5; }
+.placeholder-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 42px;
+}
+.placeholder-controls div {
+  height: 56px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.025);
+}
+
+@keyframes reveal-rise {
+  from { opacity: 0; transform: translateY(10px) scale(.985); filter: blur(5px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+@keyframes orbit-pulse {
+  from { opacity: 0; transform: rotate(-18deg) scale(.65,.26); }
+  to { opacity: 1; transform: rotate(-18deg) scale(1,.42); }
+}
+
+@media (max-width: 620px) {
+  .shell { width: min(100% - 24px, 1040px); padding-top: 18px; gap: 20px; }
+  .status-copy { display: none; }
+  .console { padding: 24px 18px; border-radius: 20px; }
+  .placeholder-controls { grid-template-columns: 1fr; margin-top: 32px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+.setup-sheet h1 {
+  max-width: 13ch;
+}
+
+.setup-copy {
+  max-width: 42rem;
+  margin: 18px 0 30px;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.setup-form fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.category-toggle {
+  position: relative;
+  cursor: pointer;
+}
+
+.category-toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.category-toggle span {
+  display: grid;
+  min-height: 52px;
+  place-items: center;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255,255,255,.025);
+  color: #c7ccda;
+  font-size: .86rem;
+  font-weight: 650;
+  transition: border-color 140ms ease, background 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.category-toggle input:checked + span {
+  border-color: rgba(255,180,95,.5);
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+.category-toggle input:focus-visible + span {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.category-toggle:active span { transform: scale(.985); }
+
+.setup-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.button {
+  min-height: 50px;
+  padding: 0 20px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  font-weight: 760;
+  letter-spacing: -.01em;
+  cursor: pointer;
+}
+
+.button--primary {
+  background: var(--accent);
+  color: #171009;
+  box-shadow: 0 12px 30px rgba(255,180,95,.16);
+}
+
+.button--quiet {
+  background: rgba(255,255,255,.035);
+  border-color: var(--line);
+  color: #d2d6e1;
+}
+
+.setup-error {
+  min-height: 1.4em;
+  margin: 10px 0 0;
+  color: #ffcda1;
+  font-size: .82rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 620px) {
+  .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .setup-actions { flex-direction: column; }
+  .button { width: 100%; }
+}
+
+.console-heading {
+  display: grid;
+  gap: 0;
+}
+
+.console-copy {
+  margin: 18px 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.telemetry {
+  display: grid;
+  gap: 22px;
+  margin-top: 34px;
+}
+
+.telemetry-group {
+  display: grid;
+  gap: 10px;
+}
+
+.telemetry-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  color: #e9e9ec;
+  font-size: .86rem;
+  font-weight: 720;
+}
+
+.telemetry-hint {
+  color: var(--muted);
+  font-size: .7rem;
+  font-weight: 560;
+  letter-spacing: .02em;
+}
+
+.choice-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.choice-row--time { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.choice-button {
+  min-height: 48px;
+  border-radius: 13px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.025);
+  color: #c7ccda;
+  font-size: .84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 130ms ease, background 130ms ease, border-color 130ms ease, color 130ms ease;
+}
+
+.choice-button:hover { border-color: rgba(255,255,255,.22); }
+.choice-button:active { transform: scale(.975); }
+.choice-button[aria-pressed="true"] {
+  background: var(--accent-soft);
+  border-color: rgba(255,180,95,.52);
+  color: var(--text);
+}
+
+.launch-button {
+  width: 100%;
+  min-height: 58px;
+  margin-top: 2px;
+  font-size: .98rem;
+}
+
+.mission-slot:empty { display: none; }
+.mission-slot { margin-top: 20px; }
+
+.mission-card {
+  position: relative;
+  overflow: hidden;
+  padding: 24px;
+  border: 1px solid rgba(255,180,95,.22);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255,180,95,.12), transparent 17rem),
+    rgba(255,255,255,.028);
+  animation: mission-arrive 260ms ease-out both;
+}
+
+.mission-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--accent);
+}
+
+.mission-card__topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--muted);
+  font-size: .67rem;
+  text-transform: uppercase;
+  letter-spacing: .13em;
+  font-weight: 760;
+}
+
+.mission-category { color: var(--accent); }
+
+.mission-card h2 {
+  margin: 14px 0 8px;
+  font-size: clamp(1.45rem, 4vw, 2.15rem);
+  line-height: 1.05;
+  letter-spacing: -.03em;
+}
+
+.mission-card p {
+  margin: 0;
+  max-width: 52ch;
+  color: #b4bac9;
+  line-height: 1.55;
+}
+
+.reroute-button {
+  margin-top: 20px;
+  min-height: 42px;
+  padding-inline: 16px;
+}
+
+.local-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,.07);
+  color: #737a8c;
+  font-size: .7rem;
+}
+
+.text-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #9299aa;
+  font-size: .72rem;
+  text-decoration: underline;
+  text-decoration-color: rgba(255,255,255,.18);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+@keyframes mission-arrive {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 620px) {
+  .telemetry { margin-top: 28px; }
+  .choice-row { gap: 6px; }
+  .choice-button { min-height: 46px; }
+  .mission-card { padding: 20px 18px; }
+  .local-footer { align-items: flex-start; flex-direction: column; }
+}
+
+/* Final visual-fit corrections from responsive browser review. */
+.console {
+  justify-self: center;
+  width: 100%;
+}
+
+.console-heading h1 {
+  max-width: 16ch;
+}
+</style>
+</head>
+<body>
+<div id="root"><div class="app"><div class="reveal" aria-label="Loading surprise"><div class="reveal__stars"></div><div class="reveal__orbit"></div><div class="reveal__orbit reveal__orbit--two"></div><div class="reveal__content"><div class="reveal__signal">●</div><h1 class="reveal__name">MOTHERSHIP</h1><p class="reveal__subline">Preparing local console…</p></div></div></div></div>
+<script>(function(){
+'use strict';
+const __modules = {
+"main.js": function(exports, __require) {
+const { App } = __require("App.js");
+const root = document.querySelector('#root');
+if (!root)
+    throw new Error('Missing #root mount');
+root.replaceChildren(App());
+
+},
+"App.js": function(exports, __require) {
+const { MissionCard } = __require("components/MissionCard.js");
+const { Reveal } = __require("components/Reveal.js");
+const { SetupSheet } = __require("components/SetupSheet.js");
+const { TelemetryControls } = __require("components/TelemetryControls.js");
+const { selectMission } = __require("domain/recommend.js");
+const { loadProfile, resetProfile, saveProfile } = __require("persistence/profile.js");
+const APP_NAME = 'MOTHERSHIP';
+function appShellHtml(content = `
+  <p class="console-kicker">Flight console</p>
+  <h1>Pick the conditions.<br><span>We'll pick the next move.</span></h1>
+  <div class="placeholder-controls" aria-hidden="true"><div></div><div></div></div>
+`) {
+    return `
+    <main class="shell">
+      <header class="masthead">
+        <div class="brand-lockup">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-name">${APP_NAME}</span>
+        </div>
+        <span class="status-copy">LOCAL / READY</span>
+      </header>
+      <section class="console" aria-label="Mission controls">${content}</section>
+    </main>
+  `;
+}
+function addResetControl(console, onReset) {
+    const footer = document.createElement('div');
+    footer.className = 'local-footer';
+    footer.innerHTML = `<span>Profile stays on this device.</span><button type="button" class="text-button" data-reset>Reset local setup</button>`;
+    footer.querySelector('[data-reset]').addEventListener('click', onReset);
+    console.append(footer);
+}
+function App() {
+    const host = document.createElement('div');
+    host.className = 'app';
+    let energy = 3;
+    let minutes = 15;
+    let profile = loadProfile();
+    const renderShell = () => {
+        host.innerHTML = appShellHtml('');
+        host.classList.add('app--ready');
+        return host.querySelector('.console');
+    };
+    const renderSetup = () => {
+        const console = renderShell();
+        console.replaceChildren(SetupSheet({
+            initialCategories: profile.enabledCategories,
+            onComplete: (categories) => {
+                profile = { ...profile, setupComplete: true, enabledCategories: categories };
+                saveProfile(profile);
+                renderFlightConsole();
+            },
+        }));
+    };
+    const chooseMission = (slot) => {
+        const mission = selectMission({
+            energy,
+            minutes,
+            enabledCategories: profile.enabledCategories,
+            recentIds: profile.recentMissionIds,
+        });
+        profile = {
+            ...profile,
+            recentMissionIds: [mission.id, ...profile.recentMissionIds.filter((id) => id !== mission.id)].slice(0, 5),
+        };
+        saveProfile(profile);
+        slot.replaceChildren(MissionCard({ mission, onReroute: () => chooseMission(slot) }));
+    };
+    const renderFlightConsole = () => {
+        const console = renderShell();
+        const heading = document.createElement('div');
+        heading.className = 'console-heading';
+        heading.innerHTML = `
+      <p class="console-kicker">Flight console</p>
+      <h1>What have you got<br><span>in the tank?</span></h1>
+      <p class="console-copy">Two readings. One next move. No list to manage.</p>
+    `;
+        console.append(heading);
+        const missionSlot = document.createElement('div');
+        missionSlot.className = 'mission-slot';
+        missionSlot.setAttribute('aria-label', 'Current mission');
+        console.append(TelemetryControls({
+            energy,
+            minutes,
+            onEnergyChange: (value) => { energy = value; },
+            onMinutesChange: (value) => { minutes = value; },
+            onLaunch: () => chooseMission(missionSlot),
+        }));
+        console.append(missionSlot);
+        addResetControl(console, () => {
+            resetProfile();
+            profile = loadProfile();
+            renderSetup();
+        });
+    };
+    const showReadyState = () => {
+        profile = loadProfile();
+        if (profile.setupComplete)
+            renderFlightConsole();
+        else
+            renderSetup();
+    };
+    host.append(Reveal({ onDone: showReadyState }));
+    return host;
+}
+
+Object.assign(exports, { APP_NAME, appShellHtml, App });
+
+},
+"components/MissionCard.js": function(exports, __require) {
+const { CATEGORY_LABELS } = __require("domain/defaultDeck.js");
+function missionCardHtml(mission) {
+    return `
+    <article class="mission-card" aria-live="polite" data-mission-id="${mission.id}">
+      <div class="mission-card__topline">
+        <span class="mission-category">${CATEGORY_LABELS[mission.category]}</span>
+        <span class="mission-time">≤ ${mission.maxMinutes} min</span>
+      </div>
+      <h2>${mission.title}</h2>
+      <p>${mission.detail}</p>
+      <button class="button button--quiet reroute-button" type="button" data-reroute>Reroute</button>
+    </article>
+  `;
+}
+function MissionCard({ mission, onReroute }) {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = missionCardHtml(mission);
+    const card = wrapper.firstElementChild;
+    card.querySelector('[data-reroute]').addEventListener('click', onReroute);
+    return card;
+}
+
+Object.assign(exports, { missionCardHtml, MissionCard });
+
+},
+"domain/defaultDeck.js": function(exports, __require) {
+const CATEGORY_LABELS = {
+    make: 'Make',
+    reset: 'Reset',
+    move: 'Move',
+    listen: 'Listen',
+    wander: 'Wander',
+    pause: 'Pause',
+};
+const DEFAULT_DECK = [
+    { id: 'make-tiny', category: 'make', title: 'Make one tiny thing', detail: 'Give yourself 15 minutes to make something small enough to finish.', minEnergy: 2, maxEnergy: 5, maxMinutes: 15 },
+    { id: 'make-rough', category: 'make', title: 'Ship the rough version', detail: 'Pick one unfinished idea and make the smallest version that counts.', minEnergy: 4, maxEnergy: 5, maxMinutes: 30 },
+    { id: 'make-sketch', category: 'make', title: 'Sketch the next thing', detail: 'Use one page, note, or canvas to rough out an idea without polishing it.', minEnergy: 1, maxEnergy: 3, maxMinutes: 15 },
+    { id: 'reset-surface', category: 'reset', title: 'Clear one surface', detail: 'Choose one visible surface and reset only that. Stop when it is clear.', minEnergy: 1, maxEnergy: 5, maxMinutes: 5 },
+    { id: 'reset-tabs', category: 'reset', title: 'Close the tabs', detail: 'Keep what matters, close the rest, and leave one clean starting point.', minEnergy: 2, maxEnergy: 5, maxMinutes: 15 },
+    { id: 'reset-launchpad', category: 'reset', title: 'Set up the next launch', detail: 'Put the one thing you want next within easy reach, then walk away.', minEnergy: 2, maxEnergy: 4, maxMinutes: 30 },
+    { id: 'move-song', category: 'move', title: 'Take a one-song lap', detail: 'Put on one track and keep moving until it ends. No distance target.', minEnergy: 1, maxEnergy: 5, maxMinutes: 5 },
+    { id: 'move-block', category: 'move', title: 'Walk one block farther', detail: 'Head outside and take one extra block before turning back.', minEnergy: 2, maxEnergy: 5, maxMinutes: 15 },
+    { id: 'move-loop', category: 'move', title: 'Find a longer loop', detail: 'Pick a familiar route, add one detour, and let the route be the point.', minEnergy: 3, maxEnergy: 5, maxMinutes: 30 },
+    { id: 'listen-track', category: 'listen', title: 'Play one track properly', detail: 'One song, start to finish, with nothing else competing for attention.', minEnergy: 1, maxEnergy: 5, maxMinutes: 5 },
+    { id: 'listen-three', category: 'listen', title: 'Take a three-song drift', detail: 'Queue three songs that fit the moment and do nothing else until they finish.', minEnergy: 1, maxEnergy: 4, maxMinutes: 15 },
+    { id: 'listen-album', category: 'listen', title: 'Give an album some room', detail: 'Pick a record you already like and stay with it for half an hour.', minEnergy: 1, maxEnergy: 3, maxMinutes: 30 },
+    { id: 'wander-turn', category: 'wander', title: 'Take the unnecessary turn', detail: 'Go somewhere nearby and choose one route you normally skip.', minEnergy: 2, maxEnergy: 5, maxMinutes: 15 },
+    { id: 'wander-photo', category: 'wander', title: 'Collect five weird details', detail: 'Walk until you notice five things worth photographing or remembering.', minEnergy: 2, maxEnergy: 5, maxMinutes: 30 },
+    { id: 'wander-hour', category: 'wander', title: 'Let an hour be unplanned', detail: 'Pick a direction, keep the phone useful but quiet, and see where you end up.', minEnergy: 3, maxEnergy: 5, maxMinutes: 60 },
+    { id: 'pause-window', category: 'pause', title: 'Window mode', detail: 'Sit somewhere with a view and do absolutely nothing for five minutes.', minEnergy: 1, maxEnergy: 5, maxMinutes: 5 },
+    { id: 'pause-drink', category: 'pause', title: 'Make a drink. Sit down.', detail: 'Prepare something you like, then actually stop while you have it.', minEnergy: 1, maxEnergy: 4, maxMinutes: 15 },
+    { id: 'pause-offline', category: 'pause', title: 'Go deliberately offline', detail: 'Put the screen down for half an hour and let the gap stay empty.', minEnergy: 1, maxEnergy: 3, maxMinutes: 30 },
+];
+
+Object.assign(exports, { CATEGORY_LABELS, DEFAULT_DECK });
+
+},
+"components/Reveal.js": function(exports, __require) {
+function Reveal({ onDone }) {
+    const overlay = document.createElement('section');
+    overlay.className = 'reveal';
+    overlay.setAttribute('aria-label', 'Mothership arrival');
+    overlay.innerHTML = `
+    <div class="reveal__orbit reveal__orbit--one" aria-hidden="true"></div>
+    <div class="reveal__orbit reveal__orbit--two" aria-hidden="true"></div>
+    <div class="reveal__stars" aria-hidden="true"></div>
+    <div class="reveal__content">
+      <div class="reveal__signal" aria-hidden="true">●</div>
+      <p class="reveal__name">MOTHERSHIP</p>
+      <p class="reveal__subline">Signal acquired.</p>
+    </div>
+  `;
+    let finished = false;
+    let timer = 0;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const finish = () => {
+        if (finished)
+            return;
+        finished = true;
+        window.clearTimeout(timer);
+        window.removeEventListener('keydown', finish);
+        overlay.removeEventListener('pointerdown', finish);
+        overlay.classList.add('reveal--departing');
+        window.setTimeout(onDone, reduced ? 0 : 180);
+    };
+    timer = window.setTimeout(finish, reduced ? 0 : 850);
+    window.addEventListener('keydown', finish);
+    overlay.addEventListener('pointerdown', finish);
+    overlay.tabIndex = 0;
+    return overlay;
+}
+
+Object.assign(exports, { Reveal });
+
+},
+"components/SetupSheet.js": function(exports, __require) {
+const { CATEGORY_LABELS } = __require("domain/defaultDeck.js");
+const ALL_CATEGORIES = ['make', 'reset', 'move', 'listen', 'wander', 'pause'];
+function setupSheetHtml(initialCategories) {
+    const selected = new Set(initialCategories);
+    const toggles = ALL_CATEGORIES.map((category) => `
+    <label class="category-toggle">
+      <input type="checkbox" name="category" value="${category}" ${selected.has(category) ? 'checked' : ''} />
+      <span>${CATEGORY_LABELS[category]}</span>
+    </label>
+  `).join('');
+    return `
+    <div class="setup-sheet">
+      <p class="console-kicker">Tune the signal</p>
+      <h1>What kinds of detours are allowed?</h1>
+      <p class="setup-copy">Choose what you want in the mix. This stays on this device.</p>
+      <form class="setup-form">
+        <fieldset>
+          <legend class="sr-only">Allowed mission categories</legend>
+          <div class="category-grid">${toggles}</div>
+        </fieldset>
+        <div class="setup-actions">
+          <button class="button button--primary" type="submit">Launch</button>
+          <button class="button button--quiet" type="button" data-use-all>Use all</button>
+        </div>
+        <p class="setup-error" data-setup-error aria-live="polite"></p>
+      </form>
+    </div>
+  `;
+}
+function SetupSheet({ initialCategories, onComplete, }) {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = setupSheetHtml(initialCategories);
+    const sheet = wrapper.firstElementChild;
+    const form = sheet.querySelector('form');
+    const error = sheet.querySelector('[data-setup-error]');
+    const selected = () => [...form.querySelectorAll('input[name="category"]:checked')]
+        .map((input) => input.value);
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const categories = selected();
+        if (categories.length === 0) {
+            error.textContent = 'Keep at least one route open.';
+            return;
+        }
+        onComplete(categories);
+    });
+    sheet.querySelector('[data-use-all]').addEventListener('click', () => {
+        form.querySelectorAll('input[name="category"]').forEach((input) => { input.checked = true; });
+        error.textContent = '';
+    });
+    form.addEventListener('change', () => {
+        if (selected().length > 0)
+            error.textContent = '';
+    });
+    return sheet;
+}
+
+Object.assign(exports, { setupSheetHtml, SetupSheet });
+
+},
+"components/TelemetryControls.js": function(exports, __require) {
+function telemetryControlsHtml(energy, minutes) {
+    const energyButtons = [1, 2, 3, 4, 5].map((value) => `
+    <button type="button" class="choice-button" data-energy="${value}" aria-pressed="${value === energy}">${value}</button>
+  `).join('');
+    const timeButtons = [5, 15, 30, 60].map((value) => `
+    <button type="button" class="choice-button" data-minutes="${value}" aria-pressed="${value === minutes}">${value === 60 ? '60+' : value}</button>
+  `).join('');
+    return `
+    <div class="telemetry" data-telemetry>
+      <div class="telemetry-group">
+        <div class="telemetry-label">
+          <span>Energy</span>
+          <span class="telemetry-hint">1 low · 5 charged</span>
+        </div>
+        <div class="choice-row" role="group" aria-label="Energy">${energyButtons}</div>
+      </div>
+      <div class="telemetry-group">
+        <div class="telemetry-label">
+          <span>Time available</span>
+          <span class="telemetry-hint">minutes</span>
+        </div>
+        <div class="choice-row choice-row--time" role="group" aria-label="Time available">${timeButtons}</div>
+      </div>
+      <button class="button button--primary launch-button" type="button" data-launch>Launch</button>
+    </div>
+  `;
+}
+function TelemetryControls({ energy, minutes, onEnergyChange, onMinutesChange, onLaunch, }) {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = telemetryControlsHtml(energy, minutes);
+    const element = wrapper.firstElementChild;
+    element.querySelectorAll('[data-energy]').forEach((button) => {
+        button.addEventListener('click', () => {
+            element.querySelectorAll('[data-energy]').forEach((item) => item.setAttribute('aria-pressed', 'false'));
+            button.setAttribute('aria-pressed', 'true');
+            onEnergyChange(Number(button.dataset.energy));
+        });
+    });
+    element.querySelectorAll('[data-minutes]').forEach((button) => {
+        button.addEventListener('click', () => {
+            element.querySelectorAll('[data-minutes]').forEach((item) => item.setAttribute('aria-pressed', 'false'));
+            button.setAttribute('aria-pressed', 'true');
+            onMinutesChange(Number(button.dataset.minutes));
+        });
+    });
+    element.querySelector('[data-launch]').addEventListener('click', () => onLaunch?.());
+    return element;
+}
+
+Object.assign(exports, { telemetryControlsHtml, TelemetryControls });
+
+},
+"domain/recommend.js": function(exports, __require) {
+const { DEFAULT_DECK } = __require("domain/defaultDeck.js");
+function pick(candidates, recentIds) {
+    if (candidates.length === 0)
+        throw new Error('No missions available');
+    const mostRecent = recentIds[0];
+    return candidates.find((mission) => mission.id !== mostRecent) ?? candidates[0];
+}
+function byClosestFit(a, b, input) {
+    const energyDistance = (mission) => {
+        if (input.energy < mission.minEnergy)
+            return mission.minEnergy - input.energy;
+        if (input.energy > mission.maxEnergy)
+            return input.energy - mission.maxEnergy;
+        return 0;
+    };
+    const timeDistance = (mission) => Math.max(0, mission.maxMinutes - input.minutes);
+    return (energyDistance(a) * 10 + timeDistance(a)) - (energyDistance(b) * 10 + timeDistance(b));
+}
+function selectMission(input, deck = DEFAULT_DECK) {
+    const enabled = deck.filter((mission) => input.enabledCategories.includes(mission.category));
+    if (enabled.length === 0)
+        throw new Error('At least one mission category must be enabled');
+    const exact = enabled.filter((mission) => mission.minEnergy <= input.energy &&
+        mission.maxEnergy >= input.energy &&
+        mission.maxMinutes <= input.minutes);
+    if (exact.length > 0)
+        return pick(exact, input.recentIds);
+    const timeSafe = enabled.filter((mission) => mission.maxMinutes <= input.minutes);
+    if (timeSafe.length > 0)
+        return pick([...timeSafe].sort((a, b) => byClosestFit(a, b, input)), input.recentIds);
+    const energyFit = enabled.filter((mission) => mission.minEnergy <= input.energy && mission.maxEnergy >= input.energy);
+    if (energyFit.length > 0)
+        return pick([...energyFit].sort((a, b) => byClosestFit(a, b, input)), input.recentIds);
+    return pick([...enabled].sort((a, b) => byClosestFit(a, b, input)), input.recentIds);
+}
+
+Object.assign(exports, { selectMission });
+
+},
+"persistence/profile.js": function(exports, __require) {
+const STORAGE_KEY = 'mothership.profile.v1';
+const ALL_CATEGORIES = ['make', 'reset', 'move', 'listen', 'wander', 'pause'];
+const VALID_CATEGORIES = new Set(ALL_CATEGORIES);
+function defaults() {
+    return {
+        version: 1,
+        setupComplete: false,
+        enabledCategories: [...ALL_CATEGORIES],
+        recentMissionIds: [],
+    };
+}
+function getStorage() {
+    try {
+        return typeof localStorage === 'undefined' ? null : localStorage;
+    }
+    catch {
+        return null;
+    }
+}
+function normalize(value) {
+    if (!value || typeof value !== 'object')
+        return null;
+    const candidate = value;
+    if (candidate.version !== 1 || typeof candidate.setupComplete !== 'boolean')
+        return null;
+    if (!Array.isArray(candidate.enabledCategories) || !Array.isArray(candidate.recentMissionIds))
+        return null;
+    const enabledCategories = candidate.enabledCategories.filter((category) => typeof category === 'string' && VALID_CATEGORIES.has(category));
+    if (enabledCategories.length === 0)
+        return null;
+    const recentMissionIds = candidate.recentMissionIds
+        .filter((id) => typeof id === 'string' && id.length > 0)
+        .slice(0, 5);
+    return {
+        version: 1,
+        setupComplete: candidate.setupComplete,
+        enabledCategories: [...new Set(enabledCategories)],
+        recentMissionIds,
+    };
+}
+function loadProfile() {
+    const storage = getStorage();
+    if (!storage)
+        return defaults();
+    try {
+        const raw = storage.getItem(STORAGE_KEY);
+        if (!raw)
+            return defaults();
+        return normalize(JSON.parse(raw)) ?? defaults();
+    }
+    catch {
+        return defaults();
+    }
+}
+function saveProfile(profile) {
+    const storage = getStorage();
+    if (!storage)
+        return;
+    const safe = normalize({ ...profile, recentMissionIds: profile.recentMissionIds.slice(0, 5) }) ?? defaults();
+    try {
+        storage.setItem(STORAGE_KEY, JSON.stringify(safe));
+    }
+    catch {
+        // Local persistence is a convenience; storage failures must not block the app.
+    }
+}
+function resetProfile() {
+    const storage = getStorage();
+    if (!storage)
+        return;
+    try {
+        storage.removeItem(STORAGE_KEY);
+    }
+    catch {
+        // Reset remains best-effort if browser storage is unavailable.
+    }
+}
+
+Object.assign(exports, { loadProfile, saveProfile, resetProfile });
+
+}
+};
+const __cache = Object.create(null);
+function __require(id){
+  if (__cache[id]) return __cache[id];
+  const factory = __modules[id];
+  if (!factory) throw new Error('Missing bundled module: ' + id);
+  const exports = {};
+  __cache[id] = exports;
+  factory(exports, __require);
+  return exports;
+}
+__require('main.js');
+})();</script>
+<noscript><p style="position:fixed;left:1rem;right:1rem;bottom:1rem;text-align:center;color:#f7f5ef">This surprise needs JavaScript enabled to launch.</p></noscript>
+</body>
+</html>
