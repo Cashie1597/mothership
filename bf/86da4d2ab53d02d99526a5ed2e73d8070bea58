@@ -1,0 +1,39 @@
+src/domain/defaultDeck.js
+  s_631e491ff5fac1::t_6ab4cf46741636 1-32
+tests/profile.test.js
+  s_631e491ff5fac1::t_27d70a24440e69 1-32
+README.md
+  s_631e491ff5fac1::t_27d70a24440e69 1-12,15-46
+  s_631e491ff5fac1::t_43a45d3a15cd65 13-14
+tests/domain.test.js
+  s_631e491ff5fac1::t_e4fc77a3b03d82 4,32-44
+  s_631e491ff5fac1::t_27d70a24440e69 1-3,5-31,45
+.gitignore
+  s_631e491ff5fac1::t_27d70a24440e69 1-2
+LICENSE
+  s_631e491ff5fac1::t_27d70a24440e69 1-21
+index.html
+  s_631e491ff5fac1::t_b7bad45ddbcd85 8-11,14-16
+PRIVACY.md
+  s_631e491ff5fac1::t_27d70a24440e69 1-20
+package.json
+  s_631e491ff5fac1::t_27d70a24440e69 1-9
+assets/favicon.svg
+  s_631e491ff5fac1::t_b7bad45ddbcd85 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "bf86da4d2ab53d02d99526a5ed2e73d8070bea58",
+  "prompts": {},
+  "sessions": {
+    "s_631e491ff5fac1": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a104ae-e14e-7091-bce9-50d9840dba5c",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "Cashie <250787069+Cashie1597@users.noreply.github.com>"
+    }
+  }
+}
